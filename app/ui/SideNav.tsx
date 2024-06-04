@@ -1,5 +1,5 @@
-'use client'
-import {useState } from "react";
+"use client";
+import { ChangeEvent, useState } from "react";
 import {
   Dialog,
   DialogPanel,
@@ -7,26 +7,25 @@ import {
   TransitionChild,
 } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import {
-  FunnelIcon,
-} from "@heroicons/react/20/solid";
+import { FunnelIcon } from "@heroicons/react/20/solid";
+import { ClipAction, ClipActionType, bodyParts } from "../lib/types";
 
+const subCategories = Object.keys(bodyParts) as bodyParts[];
 
-const subCategories = [
-  { name: "Arm", href: "#" },
-  { name: "Chest", href: "#" },
-  { name: "Shoulder", href: "#" },
-  { name: "Back", href: "#" },
-  { name: "Leg", href: "#" },
-];
-
-
-export default function SideNav({
-  children,
-}: Readonly<{
+type SideNavProps = {
+  dispatch: React.Dispatch<ClipAction>;
   children: React.ReactNode;
-}>) {
+};
+
+export default function SideNav({ children, dispatch }: SideNavProps) {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const onFilterClick = (selectedBodyPart: bodyParts) => {
+    dispatch({
+      type: ClipActionType.SetSelectedBodyPart,
+      payload: selectedBodyPart,
+    });
+    dispatch({ type: ClipActionType.FilterClips });
+  };
 
   return (
     <div className="">
@@ -80,10 +79,11 @@ export default function SideNav({
                       className="px-2 py-3 font-medium text-gray-900"
                     >
                       {subCategories.map((category) => (
-                        <li key={category.name}>
-                          <a href={category.href} className="block px-2 py-3">
-                            {category.name}
-                          </a>
+                        <li
+                          key={category}
+                          onClick={() => onFilterClick(category)}
+                        >
+                          <p className="block px-2 py-3">{category}</p>
                         </li>
                       ))}
                     </ul>
@@ -126,8 +126,12 @@ export default function SideNav({
                   className="space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900"
                 >
                   {subCategories.map((category) => (
-                    <li key={category.name}>
-                      <a href={category.href}>{category.name}</a>
+                    <li
+                      onClick={() => onFilterClick(category)}
+                      key={category}
+                      className="cursor-pointer hover:bg-violet-40"
+                    >
+                      <p>{category}</p>
                     </li>
                   ))}
                 </ul>
